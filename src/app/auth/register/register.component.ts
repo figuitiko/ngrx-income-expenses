@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {createGlobalSettings} from "@angular/cli/utilities/config";
 import {AuthService} from "../../services/auth.service";
 import {Router} from "@angular/router";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-register',
@@ -28,6 +29,7 @@ export class RegisterComponent implements OnInit {
   }
 
   createUser(){
+    this.loading();
    if(this.formGroup.invalid) {return};
 
 
@@ -36,10 +38,35 @@ export class RegisterComponent implements OnInit {
     this.authService.createUser(name,email, password)
       .then(credentials => {
         console.log(credentials);
+        this.closeLoading();
         this.router.navigate(['/']);
       })
-      .catch(err => console.log(err) );
+      .catch(err=> {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: err.message,
 
+        })
+      });
+
+  }
+  private loading() {
+    let timerInterval
+    Swal.fire({
+      title: 'Auto close alert!',
+      html: 'I will close in <b></b> milliseconds.',
+      timer: 2000,
+      timerProgressBar: true,
+      onBeforeOpen: () => {
+        Swal.showLoading()
+
+      }
+    })
+  }
+
+  private closeLoading(){
+    Swal.close();
   }
 
 }
